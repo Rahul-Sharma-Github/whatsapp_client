@@ -1,20 +1,21 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+// void main() {
+//   runApp(const MainApp());
+// }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+// class MainApp extends StatelessWidget {
+//   const MainApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GetMaterialApp(
+//       initialRoute: '/',
+//       getPages: [
+//         GetPage(name: '/', page: () => LoginScreen()),
+//         GetPage(name: '/home', page: () => WhatsAppScreen()),
+//       ],
+//     );
+//   }
+// }
