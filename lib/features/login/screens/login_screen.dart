@@ -17,7 +17,10 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             children: [
               TextField(
-                decoration: const InputDecoration(labelText: "Mobile Number"),
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: "Mobile Number",
+                ),
                 onChanged: (value) => controller.mobileNumber.value = value,
               ),
               const SizedBox(height: 16),
