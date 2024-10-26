@@ -12,6 +12,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController messageController = TextEditingController();
 
+    // Join the group when the screen is created
     controller.joinGroup(groupName);
 
     return Scaffold(
@@ -30,8 +31,10 @@ class ChatScreen extends StatelessWidget {
                   var messageData = messages[index];
                   bool isMe = messageData['isMe'];
                   String messageId = messageData['id'];
+
+                  // Cast the reactions to Map<String, String>
                   Map<String, String> reactions =
-                      messageData['reactions'] ?? {};
+                      Map<String, String>.from(messageData['reactions'] ?? {});
 
                   return Column(
                     crossAxisAlignment: isMe
@@ -77,7 +80,7 @@ class ChatScreen extends StatelessWidget {
                                     padding: const EdgeInsets.all(2.0),
                                     child: Chip(
                                       label:
-                                          Text('Reacted with : ${entry.value}'),
+                                          Text('Reacted with: ${entry.value}'),
                                     ),
                                   ))
                               .toList(),

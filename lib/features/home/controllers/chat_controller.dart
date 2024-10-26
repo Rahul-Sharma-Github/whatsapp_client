@@ -21,20 +21,19 @@ class ChatController extends GetxController {
   void initializeSocket() {
     String serverUrl;
 
-    if (kIsWeb) {
-      serverUrl = 'https://whatsapp-server-e47u.onrender.com';
-    } else if (io.Platform.isAndroid) {
+    if (kIsWeb || io.Platform.isAndroid || io.Platform.isIOS) {
       serverUrl = 'https://whatsapp-server-e47u.onrender.com';
     } else {
       serverUrl = 'https://whatsapp-server-e47u.onrender.com';
     }
 
     socket = IO.io(
-        serverUrl,
-        IO.OptionBuilder()
-            .setTransports(['websocket'])
-            .disableAutoConnect()
-            .build());
+      serverUrl,
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .build(),
+    );
 
     socket?.connect();
 
@@ -82,7 +81,7 @@ class ChatController extends GetxController {
       Map<String, String>? reactions =
           Map<String, String>.from(data['reactions'] ?? {});
 
-      if (messageId != null) {
+      if (messageId != null && groupMessages.containsKey(groupName)) {
         var message = groupMessages[groupName]
             ?.firstWhere((msg) => msg['id'] == messageId);
         if (message != null) {
@@ -90,6 +89,28 @@ class ChatController extends GetxController {
           groupMessages.refresh();
         }
       }
+    });
+
+    // Listen for previous messages from the server when joining a group
+    socket?.on('previousMessages', (messages) {
+      String groupName = currentGroup.value;
+
+      if (!groupMessages.containsKey(groupName)) {
+        groupMessages[groupName] = [];
+      }
+
+      // Clear any existing messages for the group and add the previous messages
+      groupMessages[groupName]!.clear();
+      for (var msg in messages) {
+        groupMessages[groupName]!.add({
+          'id': msg['id'],
+          'userName': msg['userName'],
+          'message': msg['message'],
+          'isMe': msg['userName'] == userName.value,
+          'reactions': msg['reactions'] ?? {},
+        });
+      }
+      groupMessages.refresh();
     });
   }
 
