@@ -5,12 +5,11 @@ import 'dart:io' as io; // Only for non-web platforms
 
 class ChatController extends GetxController {
   IO.Socket? socket;
-  var groups = <String>[].obs; // List of joined groups
+  var groups = <String>[].obs;
   var groupMessages = <String, List<Map<String, dynamic>>>{}
       .obs; // Map of messages for each group
-  var currentGroup = ''.obs; // Tracks the current group
-  var userName =
-      'User${DateTime.now().millisecondsSinceEpoch}'.obs; // Temporary username
+  var currentGroup = ''.obs;
+  var userName = 'User${DateTime.now().millisecondsSinceEpoch}'.obs;
 
   @override
   void onInit() {
@@ -23,11 +22,11 @@ class ChatController extends GetxController {
     String serverUrl;
 
     if (kIsWeb) {
-      serverUrl = 'http://localhost:3000';
+      serverUrl = 'https://whatsapp-server-e47u.onrender.com';
     } else if (io.Platform.isAndroid) {
-      serverUrl = 'http://10.0.2.2:3000';
+      serverUrl = 'https://whatsapp-server-e47u.onrender.com';
     } else {
-      serverUrl = 'http://localhost:3000';
+      serverUrl = 'https://whatsapp-server-e47u.onrender.com';
     }
 
     socket = IO.io(
@@ -52,24 +51,44 @@ class ChatController extends GetxController {
       String? groupName = data['groupName'] as String?;
       String? userName = data['userName'] as String?;
       String? message = data['message'] as String?;
+      String? messageId = data['id'] as String?;
+      Map<String, String>? reactions =
+          Map<String, String>.from(data['reactions'] ?? {});
 
-      // Ensure data is valid before processing
-      if (groupName != null && userName != null && message != null) {
-        // Initialize message list for group if it doesn't exist
+      if (groupName != null &&
+          userName != null &&
+          message != null &&
+          messageId != null) {
         if (!groupMessages.containsKey(groupName)) {
           groupMessages[groupName] = [];
         }
 
-        // Add message to the appropriate group
         bool isMe = userName == this.userName.value;
         groupMessages[groupName]!.add({
+          'id': messageId,
           'userName': isMe ? 'Me' : userName,
           'message': message,
-          'isMe': isMe
+          'isMe': isMe,
+          'reactions': reactions,
         });
-
-        // Update UI
         groupMessages.refresh();
+      }
+    });
+
+    // Listen for reaction updates
+    socket?.on('updateMessage', (data) {
+      String? groupName = currentGroup.value;
+      String? messageId = data['id'] as String?;
+      Map<String, String>? reactions =
+          Map<String, String>.from(data['reactions'] ?? {});
+
+      if (messageId != null) {
+        var message = groupMessages[groupName]
+            ?.firstWhere((msg) => msg['id'] == messageId);
+        if (message != null) {
+          message['reactions'] = reactions;
+          groupMessages.refresh();
+        }
       }
     });
   }
@@ -109,6 +128,16 @@ class ChatController extends GetxController {
         'userName': userName.value
       });
     }
+  }
+
+  // React to a message in the current group
+  void reactToMessage(String messageId, String reaction) {
+    socket?.emit('reactToMessage', {
+      'groupName': currentGroup.value,
+      'messageId': messageId,
+      'userName': userName.value,
+      'reaction': reaction
+    });
   }
 
   @override
