@@ -28,7 +28,7 @@ class LoginController extends GetxController {
 
   void verifyOtp() {
     if (otp.value == "123456") {
-      Get.offNamed('/home'); // Navigate to the home screen
+      Get.toNamed('/home'); // Navigate to the home screen
       Get.snackbar('Success', 'Navigated to Home');
     } else {
       Get.snackbar(

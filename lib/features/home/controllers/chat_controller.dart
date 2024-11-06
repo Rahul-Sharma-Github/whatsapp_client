@@ -1,7 +1,12 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/foundation.dart'; // For platform check on web
-import 'dart:io' as io; // Only for non-web platforms
+import 'dart:io' as io;
+
+import '../../login/controllers/login_controller.dart'; // Only for non-web platforms
+
+final LoginController loginController =
+    Get.put(LoginController(), permanent: true);
 
 class ChatController extends GetxController {
   IO.Socket? socket;
@@ -9,7 +14,7 @@ class ChatController extends GetxController {
   var groupMessages = <String, List<Map<String, dynamic>>>{}
       .obs; // Map of messages for each group
   var currentGroup = ''.obs;
-  var userName = 'User${DateTime.now().millisecondsSinceEpoch}'.obs;
+  var userName = loginController.mobileNumber.value.obs;
 
   @override
   void onInit() {
@@ -38,11 +43,11 @@ class ChatController extends GetxController {
     socket?.connect();
 
     socket?.onConnect((_) {
-      print('Connected to the server');
+      print('$userName Connected to the server');
     });
 
     socket?.onDisconnect((_) {
-      print('Disconnected from the server');
+      print('$userName Disconnected from the server');
     });
 
     // Listen for messages from the server for the current group
