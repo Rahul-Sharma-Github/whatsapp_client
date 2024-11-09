@@ -47,36 +47,75 @@ class ChatScreen extends StatelessWidget {
                           : CrossAxisAlignment.start,
                       children: [
                         Container(
+                          width: 200,
+
                           padding: const EdgeInsets.all(10),
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
                             color: isMe ? Colors.greenAccent : Colors.grey[300],
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: SizedBox(
-                            width: 200,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                      '${messageData['userName']}: ${messageData['message']}'),
-                                ),
-                                if (reactions.isNotEmpty)
-                                  Expanded(
-                                    child: Wrap(
-                                      children: reactions.entries
-                                          .map((entry) => Padding(
-                                                padding:
-                                                    const EdgeInsets.all(2.0),
-                                                child: Chip(
-                                                  label: Text(entry.value),
-                                                ),
-                                              ))
-                                          .toList(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    color: Colors.green[100],
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            isMe
+                                                ? 'You'
+                                                : '${messageData['userName']}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                              ],
-                            ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child:
+                                              Text('${messageData['message']}'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (reactions.isNotEmpty)
+                                Container(
+                                  color: Colors.grey[100],
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Wrap(
+                                          children: reactions.entries
+                                              .map((entry) => Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            0.0),
+                                                    child: isMe
+                                                        ? Text(
+                                                            'You : ${entry.value}')
+                                                        : Text(
+                                                            '${messageData['userName']}: ${entry.value}'),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                           // child:
                         ),
